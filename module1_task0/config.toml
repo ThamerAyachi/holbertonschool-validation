@@ -2,3 +2,5 @@ baseURL = "http://example.org/"
 languageCode = "en-us"
 title = "Awesome Inc."
 theme = 'ananke'
+publishDir = "./dist"
+
