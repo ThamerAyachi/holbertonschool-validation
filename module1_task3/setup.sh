@@ -1,10 +1,3 @@
 #!/bin/bash
-
-# Update the package list
-apt-get update
-
-# Instale the required packages
-apt-get install -y hugo make
-
-# Run the build command
+sudo apt update && apt install -y hugo make
 make build
