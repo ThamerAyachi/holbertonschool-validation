@@ -4,7 +4,7 @@ POST_NAME ?= "new-blog-post"
 .PHONY: build clean post
 
 build: ##buid dist files
-	hugo --destination dist
+	hugo
 
 clean: ##clean the dist directory
 	rm -rf dist/*
