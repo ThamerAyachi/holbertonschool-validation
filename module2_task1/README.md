@@ -12,6 +12,7 @@ This project follows the following life-cycle stages:
 - `make stop`: Stops the running application.
 - `make clean`: Stops the application, deletes the binary and log files.
 - `make help`: Tests the application by sending HTTP requests.
+- `make lint`: Tests the application by sending HTTP requests.
 
 Please refer to the Makefile for more details on each stage.
 
