@@ -1,18 +1,26 @@
-POST_TITLE ?= "New blog post"
-POST_NAME ?= "new-blog-post"
+# Variables
+BINARY_NAME := awesome-api
+LOG_FILE := $(BINARY_NAME).log
+PORT := 9999
 
-.PHONY: build clean post
+.PHONY: help build run stop clean test integration-tests
 
-build: ##buid dist files
-	hugo
+help: ## Print a list of all the goals with descriptions
+	@awk 'BEGIN {FS = ":.*##"; } /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-clean: ##clean the dist directory
-	rm -rf dist/*
+build: ## Build the binary
+	go build -o $(BINARY_NAME)
 
-post: ##make a new post with title and file name passed in the commandline
-	hugo new posts/$(POST_NAME).md
-	sed -i -e 's/^title:.*$$/title: "$(POST_TITLE)"/' content/posts/$(POST_NAME).md
+run: build ## Run the application
+	./$(BINARY_NAME) > $(LOG_FILE) 2>&1 &
 
-help: ## Help lines on how to use this module
-		@echo "To use this website template"
-		@awk -F ':.*?##' '/^[a-zA-Z_-]+:.*?##/ { printf "\033[36m%-20s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+stop: ## Stop the application
+	kill "$(shell pgrep $(BINARY_NAME))"
+
+clean: ## Clean up generated files and artifacts
+	rm -f coverage-units.out coverage-integrations.out
+
+test: unit-tests integration-tests ## Run both unit tests and integration tests
+
+integration-tests: ## Run integration tests
+	go test -coverprofile=coverage-integrations.out -tags=integration ./... -v
