@@ -1,34 +1,14 @@
 #!/bin/bash
 
-# Update the package lists
-apt-get update
+sudo apt-get update && sudo apt-get install -y make git
 
-# Install required packages
-apt-get install -y curl make
+# download/install minimal version to use template ananke
+sudo curl -L https://github.com/gohugoio/hugo/releases/download/v0.84.0/hugo_extended_0.84.0_Linux-64bit.deb -o hugo.deb
+sudo apt install ./hugo.deb
+#remove file after installation
+sudo rm hugo.deb
 
-# Download and install Hugo
-HUGO_VERSION="0.88.1"
-HUGO_BINARY="/usr/local/bin/hugo"
-if [ ! -f "$HUGO_BINARY" ]; then
-  curl -L "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz" | tar -xz
-  mv hugo "$HUGO_BINARY"
-fi
-
-# Verify if the installation was successful
-if command -v hugo >/dev/null 2>&1 && command -v make >/dev/null 2>&1; then
-  echo "SETUPOK"
-else
-  echo "SETUPERROR"
-  exit 1
-fi
-
-# Run the build command
-make build
-
-# Verify if the website was generated successfully
-if [ -f "dist/index.html" ]; then
-  echo "GENERATIONOK"
-else
-  echo "GENERATIONERROR"
-  exit 1
-fi
+# download/install linter
+sudo go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.52.2
+sudo npm install -g markdownlint-cli
+sudo npm install -g markdown-link-check

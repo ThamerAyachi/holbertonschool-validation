@@ -1,4 +1,5 @@
-baseURL = "http://example.org/"
-languageCode = "en-us"
-title = "My New Hugo Site"
-publishDir = "./dist"
+baseURL = 'http://localhost:1313/'
+languageCode = 'en-us'
+title = 'Awesome Inc.'
+theme = 'ananke'
+publishDir = "dist"

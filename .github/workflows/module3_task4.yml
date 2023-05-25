@@ -1,0 +1,47 @@
+---
+name: module3_task4
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      # https://www.freeformatter.com/cron-expression-generator-quartz.html
+  schedule:
+    - cron: "0 0 * * *"
+      # https://frontside.com/blog/2020-05-26-github-actions-pull_request/
+  pull_request:
+    types: [opened, reopened, edited, ready_for_review]
+jobs:
+  build:
+    name: Build job
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Hugo
+        run: ./setup.sh
+        working-directory: module3_task3
+      - name: Validate Makefile execution
+        run: |
+          make help
+          make build
+          make lint
+          make run
+          make unit-tests
+          make integration-tests
+          make validate
+        working-directory: module3_task3
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: 1.0.1
+          files: |
+                module3_task4/awesome-website.zip
+                module3_task4/DEPLOY.md
+      - name: archive build
+        if: ${{ success()}}
+        uses: actions/upload-artifact@v3
+        with:
+          name: upload-package
+          path: module3_task4/awesome-website.zip

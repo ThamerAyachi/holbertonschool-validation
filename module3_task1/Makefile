@@ -37,3 +37,4 @@ validate: ## Validate HTML with W3C Validator
 .SILENT:
 help: ## Display what each command does
 	cat Makefile | grep '##' | tr -d '##' | head -n -1
+
