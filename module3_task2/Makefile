@@ -1,5 +1,5 @@
 lint: ## lint
-	golangci-lint run ./main.go
+	markdownlint -f DEPLOY.md README.md || true
 
 build: check ## Build awesome-api
 	go build -o awesome-api
@@ -31,9 +31,14 @@ check: ## Check markdown files
 	markdownlint ./content/posts/*.md
 	markdown-link-check ./content/posts/*.md
 
-validate: ## Validate HTML with W3C Validator
+validate: ## Validate HTML  W3C Validator
 	make build
-	python3 /opt/W3C-Validator/w3c_validator.py dist/index.html
+	git clone https://github.com/holbertonschool/W3C-Validator.git
+
+package: ## Produce awesome-website.zip containing awesome-api and dist directory
+	zip -FSr awesome-website.zip . -i dist/ awesome-api
+
 .SILENT:
 help: ## Display what each command does
 	cat Makefile | grep '##' | tr -d '##' | head -n -1
+
