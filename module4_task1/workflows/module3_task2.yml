@@ -1,0 +1,61 @@
+---
+name: module3_task2
+
+'on':
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli
+
+      - name: Lint
+        run: |
+          cd ./module3_task2
+          make lint
+
+      - name: Run unit tests
+        run: |
+          cd ./module3_task2
+          make unit-tests
+
+      - name: Run integration-tests
+        run: |
+          cd ./module3_task2
+          make integration-tests
+
+      - name: Run validate
+        run: |
+          cd ./module3_task2
+          make validate
+
+      - name: Setup environment
+        run: |
+          cd ./module3_task2
+          ./setup.sh
+
+      - name: Run Build
+        run: |
+          cd ./module3_task2
+          make build
+
+      - name: Run Package
+        run: |
+          cd ./module3_task2
+          make package
+
+      - name: Archive package
+        uses: actions/upload-artifact@v2
+        with:
+          name: awesome-website
+          path: ./module3_task2/awesome-website.zip

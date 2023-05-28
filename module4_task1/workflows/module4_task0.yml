@@ -1,0 +1,95 @@
+---
+name: module4_task0
+
+'on':
+  push:
+    branches:
+      - main
+      - master
+  schedule:
+    - cron: '0 0 * * *'
+  pull_request:
+    types: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: clone repository
+        uses: actions/checkout@v3
+
+      - name: Install markdownlint
+        run: sudo npm install -g markdownlint-cli
+
+      - name: Install markdownlint-check
+        run: sudo npm install -g markdown-link-check
+
+      - name: run lint
+        run: |
+          cd ./module4_task0
+          make lint
+
+      - name: unit-tests
+        run: |
+          cd ./module4_task0
+          make unit-tests
+
+      - name: integration-tests
+        run: |
+          cd ./module4_task0
+          make integration-tests
+
+      - name: validate tests
+        run: |
+          cd ./module4_task0
+          make validate
+
+      - name: Setup environment
+        run: |
+          cd module4_task0
+          ./setup.sh
+
+      - name: Build
+        run: |
+          cd module4_task0
+          make build
+
+      - name: run package
+        run: |
+          cd ./module4_task0
+          make package
+          make clean
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: './module4_task0/dist'
+          production-branch: main
+          github-token: ${{ secrets.MY_GITHUB_TOKEN }}
+          publish-message: "🎉 Published on"
+          deploy-message: "🚀 Deployed on"
+          enable-pull-request-comment: true
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 1
+
+  create-release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./module4_task0/awesome-website.zip
+          body_path: ./module4_taskO/DEPLOY.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}

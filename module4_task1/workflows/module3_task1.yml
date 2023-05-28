@@ -1,0 +1,28 @@
+---
+name: module3_task1
+
+"on":
+  push:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli
+
+      - name: Setup environment
+        run: |
+          cd ./module3_task1
+          ./setup.sh
+
+      - name: Build
+        run: |
+          cd ./module3_task1
+          make build

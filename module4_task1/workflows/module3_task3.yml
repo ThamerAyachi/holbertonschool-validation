@@ -1,0 +1,86 @@
+---
+name: module3_task3
+
+'on':
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install markdownlint and markdown-link-check
+        run: npm install -g markdownlint-cli markdown-link-check
+
+      - name: Install Hugo
+        run: |
+          wget https://github.com/gohugoio/hugo/releases/download/v0.87.0/\
+          hugo_extended_0.87.0_Linux-64bit.deb
+          sudo dpkg -i hugo_extended_0.87.0_Linux-64bit.deb
+
+      - name: Lint
+        run: |
+          cd ./module3_task2
+          make lint
+
+      - name: Setup environment
+        run: |
+          cd ./module3_task3
+          ./setup.sh
+
+      - name: Build and Package
+        run: |
+          cd ./module3_task3
+          make build
+          make package
+
+      - name: Archive package
+        uses: actions/upload-artifact@v2
+        with:
+          name: awesome-website
+          path: ./module3_task3/awesome-website.zip
+
+  create-release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Install markdownlint and markdown-link-check
+        run: npm install -g markdownlint-cli markdown-link-check
+
+      - name: Install Hugo
+        run: |
+          wget https://github.com/gohugoio/hugo/releases/download/v0.87.0/\
+          hugo_extended_0.87.0_Linux-64bit.deb
+          sudo dpkg -i hugo_extended_0.87.0_Linux-64bit.deb
+
+      - name: Create Package
+        run: |
+          cd module3_task3
+          make package
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./module3_task3/awesome-website.zip
+          body_path: ./module3_task3/DEPLOY.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
